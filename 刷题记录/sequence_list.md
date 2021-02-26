@@ -11,7 +11,7 @@
        int r = v.size() - 1;
        while (l <= r)
        {
-           int mid = (l - r) / 2 + r;
+           int mid = (l - r) / 2 + r;  //确定中间值
            if (mid==0 || v[mid - 1]<num && v[mid]>num)
            {
                v.insert(v.begin() + mid, num);
