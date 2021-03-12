@@ -740,3 +740,117 @@ public:
 };
 ```
 
+# [LeetCode P331 验证前序遍历序列](https://leetcode-cn.com/problems/verify-preorder-serialization-of-a-binary-tree/)
+
+很多解法，我大概只会暴力重建
+
+```c++
+//方法1：栈
+//定义：槽位：当前二叉树中正在等待被填充的位置
+/*
+*槽位默认为2，如果填入空，槽位减，如果填入元素，槽位减，向栈中压入新槽位
+*槽位为0弹出
+*/
+class Solution {
+public:
+    bool isValidSerialization(string preorder) {
+        stack<int> place;
+        place.push(1);  //放入一个空位
+        int n = preorder.size();
+        for(int i = 0 ; i < n ; ++i){
+            if(preorder[i] == ',') continue; //如果上一个是‘#’，那么会在++i后执行这条
+            else{
+                if(place.empty()) return false;  //运行过程中空栈，不合题意
+                else{
+                    while(i < n && preorder[i]>='0' && preorder[i]<='9') ++i;  //读字符
+                    //‘，’跳出是数字‘#’也可跳出
+                    place.top()-=1;  //填充空位
+                    if(place.top() == 0)
+                        place.pop();
+                    if(preorder[i] != '#')  //preorder是‘，’说明上一个读的是数字，‘#’停下，不填空位
+                        place.push(2);
+                }
+            }
+        }
+        return place.empty();
+    }
+};
+
+
+
+
+//方法2：计数 , 直接用计数器来保存空槽的数量
+class Solution {
+public:
+    bool isValidSerialization(string preorder) {
+        int cnt = 1;
+        int n = preorder.size();
+        int i = 0;
+        while(i < n){
+            if(cnt == 0) return false;
+            if(preorder[i] == ',') ++i;
+            else if(preorder[i] == '#'){
+                cnt--;
+                ++i;
+            }else{
+                while(i < n && preorder[i] != ',') ++i;
+                cnt++;
+            }
+        }
+        return cnt==0;
+    }
+};
+
+//出入度：树的出度==入度，前序遍历在最后的遍历完成之前入度>0
+class Solution {
+public:
+    bool isValidSerialization(string preorder) {
+        int degree = 1;
+        int n = preorder.size();
+        int i = 0;
+        while(i < n){
+            if(preorder[i] == ',') {  //，直接跳过
+                ++i;
+            }
+            degree--;  //入度，degree--
+            if(degree < 0) return false;
+            if(preorder[i] == '#'){  //‘#’直接跳了
+                ++i;
+                continue;
+            } 
+            while(i < n && preorder[i] != ',') ++i;  //不是‘#’，肯定是数字
+            degree+=2;
+        }
+        return degree == 0;
+    }
+};
+
+//分治：0s永远的神
+/*s = "9,3,4,#,#,1,#,#,2,#,6,#,#"
+*9是根节点，遍历左子树序列 "3,4,#,#,1,#,#,2,#,6,#,#",注意，此时并不知道右子树根节点
+*对于"3,4,#,#,1,#,#,2,#,6,#,#"，3是根节点，继续遍历左子树序列，"4,#,#,1,#,#,2,#,6,#,#"
+*对于"4,#,#,1,#,#,2,#,6,#,#"，4是根节点，继续遍历左子树序列，"#,#,1,#,#,2,#,6,#,#"
+*对于"#,#,1,#,#,2,#,6,#,#"， #为根节点，为空。说明4左子树为空，此时遍历4的右子树"#,1,#,#,2,#,6,#,#"
+*对于"#,1,#,#,2,#,6,#,#"，#为根节点，为空。说明4右子树为空，4为叶子节点，递归层返回，回到根节点为3的递归层"1,#,#,2,#,6,#,#"
+*对于"1,#,#,2,#,6,#,#"，1为根节点，说明1是3的右子树根节点。遍历1的左子树"#,#,2,#,6,#,#"
+*对于"#,#,2,#,6,#,#"，类似地，说明1是叶子节点。此时本递归层返回。回到根节点为9的递归层"2,#,6,#,#"
+*对于"2,#,6,#,#"，2为根节点，说明2是9的右子树，访问2的左子树，"#,6,#,#"
+*对于"#,6,#,#"，根节点为空，说明2的左子树为空，"6,#,#"
+*对于"6,#,#",说明6是叶子节点，左右子树均为空。
+*此时序列遍历完毕，任何一个子树都是有效的序列，所有返回true
+*/
+class Solution {
+public:
+    bool dfs(int &index,string& s){
+        if(index == s.size()) return false;
+        if(s[index] == ',') ++index;  //,跳过
+        if(s[index++] == '#') return true; //#说明底层的左(右)子树遍历完成返回
+        while(s[index] >= '0' && s[index] <= '9') ++index;
+        return dfs(index,s) && dfs(index,s);
+    }
+    bool isValidSerialization(string preorder) {
+        int index = 0;
+        return dfs(index,preorder) && index == preorder.size();
+    }
+};
+```

@@ -89,3 +89,29 @@ public:
    }
    //课本上添加了辅助0，方法更加巧妙
    ```
+
+# [LeetCode P1047删除相邻的重复元素](https://leetcode-cn.com/problems/remove-all-adjacent-duplicates-in-string/)
+
+其实就是利用栈，当栈顶元素和当前元素一样时，弹出栈顶，否则将元素插入栈，注意关键词，相邻！
+
+注意一个坑，在循环中可能会出现栈空的情况。
+
+```c++
+class Solution {
+public:
+    string removeDuplicates(string S) {
+        string res;
+        int l = 0;
+        while(l < S.size()){  //遍历一遍字符串
+            if(!res.empty() && res.back() == S[l]) //栈非空且重复
+                res.pop_back();  //弹出
+            else{
+                res.push_back(S[l]);  //栈空或者元素不重复，加入栈
+            }
+            l++;
+        }
+        return res;
+    }
+};
+```
+

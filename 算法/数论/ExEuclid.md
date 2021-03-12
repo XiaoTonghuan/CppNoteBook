@@ -9,36 +9,23 @@ $$
 代码如下
 
 ```c++
-int gcd(a,b)
-{
+int gcd(a,b){
     if(!b) return b;
     else return(b,a%b);
 }
 ```
 
-## 欧几里得和连分数
+# 裴蜀定理
 
 $$
-a\in R\;,q\in Z\;,q<a:a=q+\frac{1}{a_2}(a_2>1)\\
-若a_2\notin Z\;,a_2= q_2+\frac{1}{a_3}(a3>1)\\
-...\\
-直到a_n为整数
+\begin{align}
+令gcd&(a,b) = d\;(a,b\in Z)\\
+1. \;&\exist x,y\;\;ax+by = d\quad  \\
+2. \;&\forall x,y \;\;ax +by = k\cdot d \\
+3. \;&方程ax + by = z有解的充要条件 z = k \cdot d\\
+4. \;&gcd(a,b) = 1 的充要条件是ax+by = 1有整数解 
+\end{align}
 $$
-
-如：
-$$
-\frac{75}{48} = 1+\frac{1}{\frac{48}{27}}\\
-\frac{48}{27} = 1+\frac{1}{\frac{27}{21}}\\
-\frac{27}{21} = 1+\frac{1}{\frac{21}{6}}\\
-\frac{21}{6} = 3+\frac{1}{2}\\
-$$
-不难发现，连分数中分离出来的整数$q$是商，$a_n$的分子分母分别是除数和余数，可以把一个数表示为一个数串
-$$
-\frac{75}{48}=<1,1,1,3,2>
-$$
-这串数，就是辗转相除法每一步得到的商
-
-1. 有理数的连分数的表达式是有限的，无理数连分数的表达式是无限的
 
 # 扩展欧几里得
 
@@ -79,7 +66,7 @@ $$
 1步代换之后（由后往前），就得到了$x$和$y$的值，即
 $$
 ax+by=c\\
-bx_0+(a-[a/b]b)y_0=c
+bx_0+(a-[\frac{a}{b}]b)y_0=c
 $$
 根据待定系数法可知
 $$
@@ -96,8 +83,7 @@ $$
 using namespace std;
 static int x = 0;
 static int y = 0;  //使用静态变量记录方程的解。
-int exgcd(int a, int b)
-{
+int exgcd(int a, int b){
 	
 	if (!b) //当b为0的时候，说明到达递归边界，这时候最后一步方程的解为1，0。
 	{
@@ -124,33 +110,23 @@ int main()
 稍微简化了一下
 
 ```c++
-void Exgcd(int a,int b,int &x,int&y)
-{
-    if(b==0)
-    {
+int exgcd(int a,int b,int &x,int&y){
+    if(b==0){
         x = 1;
         y = 0;
-        return ;
+        return a;
 	}
-    Exgcd(b,a%b,y,x);
-    y -= (a/b)*x;
-    return ;
+    int d = exgcd(b,a%b,y,x);  //注意这里传入的是y，x
+    y -= (a / b) * x;
+    return d;
 }
 ```
 
-
-
-# 裴蜀定理
-
-关于$a,b$和$gcd(a,b)$的线性不定方程
-$$
-ax+by = gcd(a,b)\quad a,b\in Z
-$$
-存在$x,y$都有$ax+by$是$gcd(a,b)$的倍数。
+# 裴蜀定理的证明
 
 证明
 
-通过扩展欧几里得，我们已经知道了，这个方程的一组整数解，不妨设为$x=x_0,y=y_0$，这时候令$x_1 = x_0 + \delta$代入得到
+通过扩展欧几里 得，我们已经知道了，这个方程的一组整数解，不妨设为$x=x_0,y=y_0$，这时候令$x_1 = x_0 + \delta$代入得到
 $$
 ax_1-a\delta+by_0 = gcd(a,b)\\
 ax_1+b(y_0-\frac{a\delta}{b}) = gcd(a,b)\\
@@ -171,3 +147,27 @@ x = x_0+k\times\frac{b}{gcd(a,b)}\\
 y=y_0-k\times\frac{a}{gcd(a,b)}\\
 $$
 记忆技巧，$a$和$x$位置是相反的
+
+# 欧几里得和连分数
+
+$$
+a\in R\;,q\in Z\;,q<a:a=q+\frac{1}{a_2}(a_2>1)\\
+若a_2\notin Z\;,a_2= q_2+\frac{1}{a_3}(a3>1)\\
+...\\
+直到a_n为整数
+$$
+
+如：
+$$
+\frac{75}{48} = 1+\frac{1}{\frac{48}{27}}\\
+\frac{48}{27} = 1+\frac{1}{\frac{27}{21}}\\
+\frac{27}{21} = 1+\frac{1}{\frac{21}{6}}\\
+\frac{21}{6} = 3+\frac{1}{2}\\
+$$
+不难发现，连分数中分离出来的整数$q$是商，$a_n$的分子分母分别是除数和余数，可以把一个数表示为一个数串
+$$
+\frac{75}{48}=<1,1,1,3,2>
+$$
+这串数，就是辗转相除法每一步得到的商
+
+1. 有理数的连分数的表达式是有限的，无理数连分数的表达式是无限的
