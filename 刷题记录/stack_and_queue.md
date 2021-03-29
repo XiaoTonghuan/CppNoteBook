@@ -65,20 +65,16 @@ public:
    	que.push(1);
    	int n = 0;
    	cout << 1 << endl;
-   	for(int j = 0 ; j < 7 ; ++j)
-   	{
-   		for (int i = 0; i < j + 2; ++i)
-   		{
+   	for(int j = 0 ; j < 7 ; ++j) {
+   		for (int i = 0; i < j + 2; ++i) {
    			int temp = que.front();
-   			if (temp == 1)
-   			{
+   			if (temp == 1) {
    				que.push(temp);
    				n++;
    			}
    			cout << temp <<" ";
    			que.pop();
-   			if (n < j + 2)
-   			{
+   			if (n < j + 2) {
    				n++;
    				que.push(temp + que.front());
    			}
