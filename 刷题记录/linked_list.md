@@ -72,7 +72,7 @@ public:
             }
             flag = flag->next;  
         }  //统计大小，并且定位flag为最后一个
-        int idx = size - k > 0 ? (size - k ) % size: (size - k) % size + size;  //正数和倒数的关系
+        int idx = size - k > 0 ? (size - k ) % size : (size - k) % size + size;  //正数和倒数的关系
         while(idx){
             flag = flag->next;
             head = head->next;
