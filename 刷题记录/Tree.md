@@ -119,7 +119,7 @@ public:
         if(!root) return true;  //空树是平衡二叉树
         else
         {
-            if(abs(dfs(root->left,1) - dfs(root->right,1))<=1)  //左右子树深度差<=1
+            if(abs(dfs(root->left,1) - dfs(root->right,1)) <=1 )  //左右子树深度差<=1
                 return (isBalanced(root->left) && isBalanced(root->right)); //继续查看他的左右子树是不是平衡二叉树
             else return false;//一个不是，整棵树就不是
         }
@@ -160,6 +160,98 @@ public:
     }
 };
 ```
+
+//实际上，你需要做的只是将这棵树遍历一遍就行了，每遍历到一个节点，就交换他们的左和右。这样就产生了镜像的效果
+
+# [LeetCode P226 翻转二叉树](https://leetcode-cn.com/problems/invert-binary-tree/)
+
+这道题和上面的那道题一模一样
+
+```c++
+//先序
+class Solution {
+public:
+    TreeNode* invertTree(TreeNode* root) {
+        if(root == nullptr) return root;
+        TreeNode* tmp = root->left;
+        root->left = root->right;
+        root->right = tmp;
+
+        invertTree(root->right);
+        invertTree(root->left);
+        return root;
+    }
+};
+
+//中序
+class Solution {
+public:
+    TreeNode* invertTree(TreeNode* root) {
+        if(root == nullptr) return root;
+
+        invertTree(root->left);
+
+        TreeNode* tmp = root->left;
+        root->left = root->right;
+        root->right = tmp;
+
+        invertTree(root->left);
+
+
+        return root;
+    }
+};
+
+//后序
+class Solution {
+public:
+    TreeNode* invertTree(TreeNode* root) {
+        if(root == nullptr) return root;
+
+        invertTree(root->left);
+        invertTree(root->right);
+        TreeNode* tmp = root->left;
+        root->left = root->right;
+        root->right = tmp;
+
+        return root;
+    }
+};
+
+
+//层序
+class Solution {
+public:
+    TreeNode* invertTree(TreeNode* root) {
+        if(root == nullptr) return root;
+        queue<TreeNode*> que;
+        que.push(root);
+        while(!que.empty()){
+            TreeNode* tmp = que.front();
+            que.pop();
+            
+            if(tmp->left != nullptr) que.push(tmp->left);
+            if(tmp->right != nullptr) que.push(tmp->right);
+
+            TreeNode * l = tmp->left;
+            tmp ->left = tmp->right;
+            tmp -> right = l;
+
+        }
+        return root;
+    
+    }
+};
+
+
+//你甚至不用这些遍历的方式也行，只要你用某种方式能把所有的节点
+```
+
+
+
+
+
+
 
 # [LeetCode 剑指offer32 层序遍历输出](https://leetcode-cn.com/problems/cong-shang-dao-xia-da-yin-er-cha-shu-ii-lcof/submissions/)
 
@@ -854,3 +946,134 @@ public:
     }
 };
 ```
+
+# BST(binary search tree)
+
+- 重建搜索二叉树
+
+Question：输入搜索二叉树的后续遍历结果，重建此二叉树，并返回他的头节点
+
+```c++
+struct TreeNode 
+{
+ int val;
+ TreeNode *left;
+ TreeNode *right;
+ TreeNode() = default;
+ TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ TreeNode* CreatTree(int arr[], int L, int R)
+ {
+	 if (L > R) return nullptr;
+	 TreeNode* head = new TreeNode(arr[R]);
+	 int M = L - 1;
+	 for (int i = L; i < R; i++)
+		 if (arr[i] < arr[R])
+			 M = i;
+     //二分优化，不一定是完全有序才能使用二分，只要大体上有序就可以！
+     /*	int M = L - 1;
+	int right = R - 1;
+	int left = L;
+	while (right>=left)
+	{
+		int mid = left + ((right - left) >> 1);  //位运算那一段要加括号
+		if (arr[mid] < arr[R])
+		{
+			M = mid;
+			left = mid + 1;
+		}
+		else
+		right = mid - 1;
+	}*/
+	 head->left  = CreatTree(arr, L, M);
+	 head->right = CreatTree(arr, M + 1, R - 1);
+	 return head;
+ }
+};
+void PrintTree(TreeNode*head)
+{
+	if (head == nullptr) return;
+	cout << head->val << endl;
+	PrintTree(head->left);
+	PrintTree(head->right);
+}
+int main()
+{
+	int arr[]{ 1,4,3,7,6,9,13,12,8 };
+	TreeNode Tree1;
+	TreeNode *Treehead = Tree1.CreatTree(arr, 0, 8);
+	PrintTree(Treehead);
+}
+```
+
+Test：[1,4,3,7,6,9,13,12,8]
+
+# is Complete Tree
+
+```c++
+class Solution {
+	bool isComplete( Tree_node<int>* root){
+		/*
+		* 1. 左右都不是空 ： 加进队列
+		* 2. 左右都是空：false
+		* 3. 右空左不空：false
+		* 4. 左空右不空：之后所有的都是叶节点
+		*/
+		queue<Tree_node<int>* > que;
+		que.push(root);
+		int leaf = 0;
+		while (!que.empty()) {
+			Tree_node<int>* temp = que.front();
+			if (leaf == 1) 
+				if (temp->lc != nullptr || temp->rc != nullptr) 
+					return false;
+			if (temp->lc != nullptr) 
+				que.push(temp->lc);
+			if (temp->rc != nullptr)
+				que.push(temp->rc);
+			if (temp->lc == nullptr && temp->rc != nullptr)
+				return false;
+			else  //这里包含两种情况，一个是叶子节点的情况，另一个是左空右不空的情况
+				leaf == 1;
+			que.pop();
+		}
+		return true;
+	}
+};
+```
+
+其他写法
+
+```c++
+//其他写法
+class Solution {
+	bool isComplete( Tree_node<int>* root){
+		/*
+		* 1. 左右都不是空 ： 加进队列
+		* 2. 左右都是空：false
+		* 3. 右空左不空：false
+		* 4. 左空右不空：之后所有的都是叶节点
+		*/
+		queue<Tree_node<int>* > que;
+		que.push(root);
+		int leaf = 0;
+		while (!que.empty()) {
+			Tree_node<int>* temp = que.front();
+			if (leaf == 1) 
+				if (temp->lc != nullptr || temp->rc != nullptr) 
+					return false;
+			if (temp->lc != nullptr)
+				que.push(temp->lc);
+			else if (temp->rc == nullptr)
+				return false;
+			if (temp->rc != nullptr)
+				que.push(temp->rc);
+			else //右是空，要求之后的节点都是叶
+				leaf = true;
+		}
+		return true;
+	}
+};
+```
+
+
+
